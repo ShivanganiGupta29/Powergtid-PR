@@ -42,21 +42,9 @@ powergrid-pr-system/
 └── README.md              # This file
 ```
 
-## 🚀 Getting Started
-
-### Option 1: GitHub Pages (Recommended)
-
-1. **Fork this repository** or clone it to your GitHub account
-
-2. **Enable GitHub Pages**:
-   - Go to repository Settings → Pages
-   - Source: Select `main` branch
-   - Folder: Select `/ (root)`
-   - Click Save
-
 3. **Access your site**: Your site will be available at:
    ```
-   https://your-username.github.io/powergrid-pr-system/
+   https://your-username.github.io/powergrid-pr/
    ```
 
 ### Option 2: Local Development
