@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PowerGrid PR Management System</title>
+<link rel="stylesheet" href="css/main.css">
+</head>
+
+<body>
+
+<!-- LOGIN -->
+<div class="container login-form" id="loginDiv">
+  <div class="logo">⚡</div>
+  <div class="header">
+    <h1>PowerGrid Corporation</h1>
+    <div class="subtitle">Purchase Requisition System</div>
+  </div>
+  
+  <div class="demo-info">
+    <strong>Demo Mode</strong><br>
+    Use credentials: <strong>PG12345</strong> / <strong>password</strong>
+  </div>
+  
+  <div class="form-group">
+    <label>Employee ID</label>
+    <input id="empId" placeholder="Enter your Employee ID" value="PG12345" autocomplete="username">
+  </div>
+  
+  <div class="form-group">
+    <label>Password</label>
+    <input id="pwd" type="password" placeholder="Enter your password" value="password" autocomplete="current-password">
+  </div>
+  
+  <button class="btn" style="width: 100%;" id="loginBtn">LOGIN</button>
+</div>
+
+<!-- USER DASHBOARD -->
+<div class="container hidden" id="userDiv">
+  <div class="header">
+    <h1>Purchase Requisition System</h1>
+    <div class="subtitle">Create and manage your purchase requests</div>
+  </div>
+
+  <!-- User Info -->
+  <div class="user-info">
+    <div class="info-item">
+      <span class="label">Employee:</span>
+      <span>Sandeep Kumar</span>
+    </div>
+    <div class="info-item">
+      <span class="label">Employee No:</span>
+      <span>60018125</span>
+    </div>
+    <div class="info-item">
+      <span class="label">Department:</span>
+      <span>Electrical Maintenance</span>
+    </div>
+    <div class="info-item">
+      <span class="label">Location:</span>
+      <span>400kV Ranchi Substation</span>
+    </div>
+    <div class="info-item">
+      <span class="label">Date:</span>
+      <span id="currentDate"></span>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab-button active" data-tab="create">Create New PR</button>
+    <button class="tab-button" data-tab="mypr">My PRs</button>
+    <button class="tab-button" data-tab="findvendor">Find Vendor</button>
+    <button class="tab-button" data-tab="hq">HQ Dashboard</button>
+  </div>
+
+  <!-- CREATE PR TAB -->
+  <div id="createTab" class="tab-content active">
+    <!-- PR Status -->
+    <div class="pr-status" id="prStatusBox">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+          <div style="font-size: 12px; color: #666; margin-bottom: 5px;">CURRENT PR STATUS</div>
+          <div class="pr-number" id="prStatus">Draft (Not Submitted)</div>
+        </div>
+        <div id="prActions"></div>
+      </div>
+    </div>
+
+    <!-- Item Selection -->
+    <div style="background: #fff; padding: 20px; border-radius: 8px; border: 2px solid #eee; margin-bottom: 20px;">
+      <h3 style="margin-bottom: 15px; color: #003366;">Add Items to PR</h3>
+      
+      <div class="form-group">
+        <label>Search Material/Item from Catalog</label>
+        <div class="search-dropdown-container">
+          <input 
+            id="searchInput" 
+            type="text" 
+            placeholder="Type to search by name, code, or category..."
+            autocomplete="off"
+          >
+          <select id="searchTypeSelect" class="search-type-select">
+            <option value="all">All</option>
+            <option value="name">Name</option>
+            <option value="code">Code</option>
+            <option value="category">Category</option>
+          </select>
+          <div id="searchResults" class="search-results hidden"></div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>OR Search by Equipment (for Spare Parts)</label>
+        <div class="search-dropdown-container">
+          <input 
+            id="equipmentSearchInput" 
+            type="text" 
+            placeholder="Type equipment name: Circuit Breaker, Transformer, Relay..."
+            autocomplete="off"
+          >
+          <div id="equipmentSearchResults" class="search-results hidden"></div>
+        </div>
+      </div>
+
+      <div id="selectedItemInfo" class="hidden" style="background: #e7f3ff; padding: 12px; border-radius: 6px; margin-bottom: 15px;">
+        <strong>Selected:</strong> <span id="selectedItemDisplay"></span>
+      </div>
+
+      <div id="priceInfo" class="hidden"></div>
+
+      <div id="manualEntryDiv" class="hidden">
+        <div class="form-group">
+          <label>New Item Name/Description</label>
+          <input id="manualItemName" placeholder="Enter complete item description">
+        </div>
+        <div class="warning">
+          ⚠️ New items will be sent to HO for approval
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="form-group">
+          <label>Quantity</label>
+          <input type="number" id="qty" min="1" value="1">
+        </div>
+        <div class="form-group">
+          <label>Unit Price (₹)</label>
+          <input type="number" id="unit" min="0" step="0.01">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Select Vendor (Purchase Source) <span style="color: red;">*</span></label>
+        <select id="vendorSource">
+          <option value="">-- Select purchase source --</option>
+          <option value="local">Local Market</option>
+          <option value="gem">GeM Portal</option>
+          <option value="online">Online Platform</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+
+      <div id="vendorDetailsDiv" class="hidden">
+        <div class="form-group">
+          <label>Vendor/Platform Details</label>
+          <input id="vendorDetails" placeholder="Enter vendor name or platform details">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Remarks (Optional)</label>
+        <textarea id="itemRemarks" rows="2" placeholder="Add any additional remarks"></textarea>
+      </div>
+
+      <div style="display: flex; gap: 10px;">
+        <button class="btn" type="button" id="addItemBtn">➕ Add Item</button>
+        <button class="btn btn-secondary" type="button" id="toggleManualBtn">📝 New Item (Not in Catalog)</button>
+      </div>
+    </div>
+
+    <!-- Items Summary -->
+    <div class="item-summary" id="summaryDiv" style="display: none;">
+      <h3 style="margin-bottom: 10px; color: #003366;">PR Summary</h3>
+      <div class="summary-grid">
+        <div class="summary-card">
+          <div class="label">Total Items</div>
+          <div class="value" id="totalItems">0</div>
+        </div>
+        <div class="summary-card">
+          <div class="label">Total Quantity</div>
+          <div class="value" id="totalQty">0</div>
+        </div>
+        <div class="summary-card">
+          <div class="label">Total Amount</div>
+          <div class="value">₹<span id="totalAmount">0</span></div>
+        </div>
+        <div class="summary-card">
+          <div class="label">Emergency Items</div>
+          <div class="value" id="emergencyCount" style="color: #856404;">0</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Items Table -->
+    <div id="tableDiv" style="display: none;">
+      <h3 style="margin: 20px 0 10px; color: #003366;">PR Items</h3>
+      <table id="itemTable">
+        <thead>
+          <tr>
+            <th>Material Code</th>
+            <th>Description</th>
+            <th>Qty</th>
+            <th>Unit Price</th>
+            <th>Total</th>
+            <th>Vendor</th>
+            <th>Approval</th>
+            <th>Remarks</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="action-buttons" id="actionButtons" style="display: none;">
+      <button class="btn btn-success" id="submitPRBtn">✓ Submit PR</button>
+      <button class="btn btn-secondary" id="saveDraftBtn">💾 Save Draft</button>
+      <button class="btn btn-danger" id="clearAllBtn">🗑️ Clear All</button>
+    </div>
+
+    <div id="msg"></div>
+  </div>
+
+  <!-- MY PRs TAB -->
+  <div id="myprTab" class="tab-content">
+    <h2 style="color: #003366; margin-bottom: 20px;">My Purchase Requisitions</h2>
+    
+    <!-- Sub-tabs -->
+    <div class="subtabs">
+      <button class="subtab-button active" data-subtab="approved">Approved</button>
+      <button class="subtab-button" data-subtab="pending">Pending Approval</button>
+      <button class="subtab-button" data-subtab="draft">Draft</button>
+      <button class="subtab-button" data-subtab="rejected">Rejected</button>
+    </div>
+
+    <!-- Approved Sub-tab -->
+    <div id="approvedSubTab" class="subtab-content active">
+      <div style="margin-bottom: 15px;">
+        <label style="font-weight: 600; margin-right: 10px;">Filter:</label>
+        <button class="btn btn-small filter-btn active" data-filter="all">All</button>
+        <button class="btn btn-small btn-secondary filter-btn" data-filter="purchased">Purchased</button>
+        <button class="btn btn-small btn-secondary filter-btn" data-filter="unpurchased">Unpurchased</button>
+      </div>
+      <div id="approvedPRList"></div>
+    </div>
+
+    <!-- Pending Approval Sub-tab -->
+    <div id="pendingSubTab" class="subtab-content hidden">
+      <div id="pendingPRList"></div>
+    </div>
+
+    <!-- Draft Sub-tab -->
+    <div id="draftSubTab" class="subtab-content hidden">
+      <div id="draftPRList"></div>
+    </div>
+
+    <!-- Rejected Sub-tab -->
+    <div id="rejectedSubTab" class="subtab-content hidden">
+      <div id="rejectedPRList"></div>
+    </div>
+  </div>
+
+  <!-- FIND VENDOR TAB -->
+  <div id="findvendorTab" class="tab-content">
+    <h2 style="color: #003366; margin-bottom: 20px;">Find Vendor</h2>
+    
+    <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+      <h3 style="margin-bottom: 15px; color: #003366;">Search for Vendors</h3>
+      
+      <div class="grid-2">
+        <div class="form-group">
+          <label>Search by Material/Product</label>
+          <input type="text" id="vendorSearchProduct" placeholder="e.g., MCB, Cable, Relay">
+        </div>
+        <div class="form-group">
+          <label>Search by Equipment Name (for Spares)</label>
+          <input type="text" id="vendorSearchEquipment" placeholder="e.g., 400kV SF6 Circuit Breaker">
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label>Equipment Model/Serial (Optional)</label>
+        <input type="text" id="vendorSearchModel" placeholder="e.g., Siemens 3AP1FG, ABB ELK-14">
+      </div>
+      
+      <button class="btn" id="searchVendorBtn">🔍 Search Vendors</button>
+    </div>
+
+    <div id="vendorResults"></div>
+  </div>
+
+  <!-- HQ DASHBOARD TAB -->
+  <div id="hqTab" class="tab-content">
+    <h2 style="color: #003366; margin-bottom: 20px;">HQ Dashboard</h2>
+    <p style="color: #666;">HQ dashboard features coming soon...</p>
+  </div>
+
+</div>
+
+<script src="js/data.js"></script>
+<script src="js/prManager.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
